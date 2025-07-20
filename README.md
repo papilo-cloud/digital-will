@@ -7,4 +7,4 @@
 
 >  Secure your assets. Automate your legacy. Trust code, not courts.
 
-## 📌 Features
+## Features
