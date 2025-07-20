@@ -37,5 +37,10 @@ contract CreateWill {
         will = Will(_beneficiaries, _amounts, false, block.timestamp);
     }
 
+    function ping() external  {
+        require(msg.sender == owner, "Only the owner can ping");
+        will.lastPing = block.timestamp;
+    }
+
     receive() external payable {}
 }
