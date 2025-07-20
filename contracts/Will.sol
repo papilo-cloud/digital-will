@@ -22,8 +22,12 @@ contract CreateWill {
         owner = msg.sender;
     }
 
-    function createWill(address[] memory _beneficiaries, uint256[] memory _amounts) external  {
-        require(msg.sender == owner, "Only the owner can create Will");
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
+
+    function createWill(address[] memory _beneficiaries, uint256[] memory _amounts) external onlyOwner {
         require(_beneficiaries.length == _amounts.length, "Bebeficiaries and amount must be of the same length");
         require(_beneficiaries.length > 0 && _amounts.length > 0, "At least one beneficiary and one amount is required");
         require(_beneficiaries.length < 10 && _amounts.length < 10, "Maximum of 10 beneficiaries and amounts allowed");
@@ -36,8 +40,7 @@ contract CreateWill {
         will = Will(_beneficiaries, _amounts, false, block.timestamp);
     }
 
-    function ping() external  {
-        require(msg.sender == owner, "Only the owner can ping");
+    function ping() external onlyOwner {
         will.lastPing = block.timestamp;
     }
 
