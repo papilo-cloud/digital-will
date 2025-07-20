@@ -44,5 +44,15 @@ contract CreateWill {
         will.lastPing = block.timestamp;
     }
 
+     function executeWill() {
+        require((block.timestamp - will.lastPing) > DEATH_TIMEOUT, "");
+        require(!will.executed, "");
+
+        for (uint i = 0; i < will.beneficiaries.length ; i++) {
+            (bool success, ) = payable(will.beneficiaries[i]).call{value: will.amounts[i]}("");
+            require(success);
+        }
+    }
+
     receive() external payable {}
 }
