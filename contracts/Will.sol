@@ -35,7 +35,7 @@ contract CreateWill {
         for (uint i = 0; i < _beneficiaries.length; i++) {
             require(_beneficiaries[i] != address(0), "Beneficiary address must be a valid address");
             require(_amounts[i] > 0, "Amount must be greater than zero");
-            require(_amounts[i] < 10 ether, "Amount must be less than 10 ether");
+            require(_amounts[i] < 100 ether, "Amount must be less than 100 ether");
         }
         will = Will(_beneficiaries, _amounts, false, block.timestamp);
     }
