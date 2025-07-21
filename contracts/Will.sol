@@ -11,6 +11,7 @@ contract CreateWill {
         uint256[] amounts;
         bool executed;
         uint lastPing;
+        bool cancelled;
     }
 
     mapping(address => Will) public usersWill;
@@ -47,6 +48,7 @@ contract CreateWill {
      function executeWill() {
         require((block.timestamp - will.lastPing) > DEATH_TIMEOUT, "Death timeout not reached");
         require(!will.executed, "Will already executed");
+        require(!will.cancelled, "Will already cancelled");
 
         for (uint i = 0; i < will.beneficiaries.length ; i++) {
             (bool success, ) = payable(will.beneficiaries[i]).call{value: will.amounts[i]}("");
@@ -54,6 +56,17 @@ contract CreateWill {
         }
 
         will.executed = true
+    }
+
+    function cancelWill() external {
+        require(!will.executed, "Will already executed");
+        require(!will.cancelled, "Will already cancelled");
+
+        uint balance = address(this).balance;
+        if (balance > 0) {
+            (bool success, ) = owner.call{value: balance}("");
+            require(success);
+        }
     }
 
     receive() external payable {}
