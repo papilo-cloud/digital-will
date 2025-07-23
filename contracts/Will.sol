@@ -14,7 +14,7 @@ contract CreateWill {
         bool cancelled;
     }
 
-    mapping(address => Will) public usersWill;
+    mapping(address => Will) private usersWill;
     
     Will public will;
 
@@ -38,14 +38,14 @@ contract CreateWill {
             require(_amounts[i] > 0, "Amount must be greater than zero");
             require(_amounts[i] < 100 ether, "Amount must be less than 100 ether");
         }
-        will = Will(_beneficiaries, _amounts, false, block.timestamp);
+        will = Will(_beneficiaries, _amounts, false, block.timestamp, false);
     }
 
     function ping() external onlyOwner {
         will.lastPing = block.timestamp;
     }
 
-     function executeWill() {
+     function executeWill() external {
         require((block.timestamp - will.lastPing) > DEATH_TIMEOUT, "Death timeout not reached");
         require(!will.executed, "Will already executed");
         require(!will.cancelled, "Will already cancelled");
@@ -55,7 +55,7 @@ contract CreateWill {
             require(success);
         }
 
-        will.executed = true
+        will.executed = true;
     }
 
     function cancelWill() external {
