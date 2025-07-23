@@ -1,4 +1,4 @@
-const { assert } = require('chai')
+const { assert, expect } = require('chai')
 const { ethers } = require('hardhat')
 
 describe('Digital Will Contract', () => {
@@ -18,5 +18,51 @@ describe('Digital Will Contract', () => {
             assert.equal(await will.owner(), owner.address, 'Not the owner')
         })
     })
-   
+    describe('Create Will', () => {
+        it('should should create a valid will with correct inputs', async () => {
+            const beneficiaries = [user1.address, user2.address];
+            const amount = [ethers.utils.parseEther('20'), ethers.utils.parseEther('10')]
+            await expect(will.createWill(beneficiaries, amount)).to.emit(will, 'WillCreated')
+        })
+        it('should fail if benefiaiary and amount length mismatch', async () => {
+            const beneficiaries = [user1.address, user2.address];
+            const amount = [ethers.utils.parseEther('20')]
+            await expect(will.createWill(beneficiaries, amount))
+                    .to.be.revertedWith('Bebeficiaries and amount must be of the same length')
+        })
+
+        it('should fail if arrays are empty', async () => {
+            await expect(will.createWill([], [])).to.be
+                .revertedWith('At least one beneficiary and one amount is required')
+        })
+
+        it('should fail if addresses are more than 10 entries', async () => {
+            const beneficiaries = Array(12).fill(user1.address)
+            const amount = Array(12).fill(ethers.utils.parseEther('10'))
+
+            await expect(will.createWill(beneficiaries, amount)).to.be
+                    .revertedWith('Maximum of 10 beneficiaries and amounts allowed')
+        })
+
+        it('should fail if one of the addresses is 0', async () => {
+            const beneficiaries = [user1.address, user2.address, '0x0000000000000000000000000000000000000000']
+            const amount = [ethers.utils.parseEther('10'), ethers.utils.parseEther('10'), ethers.utils.parseEther('10')]
+            await expect(will.createWill(beneficiaries, amount)).to.be
+                    .revertedWith("Beneficiary address must be a valid address")
+        })
+
+        it('should fail if amount is less than 0 ether', async () => {
+            const beneficiaries = [user1.address]
+            const amount = [ethers.utils.parseEther('0')]
+            await expect(will.createWill(beneficiaries, amount)).to.be
+                    .revertedWith('Amount must be greater than zero')
+        })
+
+        it('should fail if amount is greater than 100 ether', async () => {
+            const beneficiaries = [user1.address]
+            const amount = [ethers.utils.parseEther('101')]
+            await expect(will.createWill(beneficiaries, amount)).to.be
+                    .revertedWith('Amount must be less than 100 ether')
+        })
+    })
 })
