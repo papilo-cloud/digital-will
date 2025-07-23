@@ -1,8 +1,22 @@
 {
-  "dependencies": {
-    "hardhat": "^2.26.0"
+  "name": "digital-will",
+  "version": "1.0.0",
+  "description": "## Inspired by - Alchemy University Certification Project",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^6.1.0"
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "dotenv": "^17.2.0",
+    "ethers": "^5.7.0",
+    "hardhat": "^2.26.1"
   }
 }
