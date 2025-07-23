@@ -65,4 +65,20 @@ describe('Digital Will Contract', () => {
                     .revertedWith('Amount must be less than 100 ether')
         })
     })
+
+    describe('Ping functionality', () => {
+        it('should update lastPing when owner calls ping()', async () => {
+            const tx = await will.ping()
+            const receipt = await tx.wait();
+
+            const block = await ethers.provider.getBlock(receipt.blockNumber)
+            const willData = await will.will();
+
+            assert.equal(willData.lastPing, block.timestamp)
+        })
+        it('should revert if non-owner calls ping()', async () => {
+            await expect(will.connect(user1).ping()).to.be
+                    .revertedWith("Not the owner")
+        })
+    })
 })
