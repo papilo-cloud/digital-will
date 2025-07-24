@@ -2,7 +2,7 @@ const { assert, expect } = require('chai')
 const { ethers } = require('hardhat')
 
 describe('Digital Will Contract', () => {
-    let Will, will, owner, user1, user2;
+    let Will, will, owner, user1, user2, DEATH_TIMEOUT;
 
     beforeEach(async () => {
         Will = await ethers.getContractFactory('CreateWill')
@@ -80,5 +80,53 @@ describe('Digital Will Contract', () => {
             await expect(will.connect(user1).ping()).to.be
                     .revertedWith("Not the owner")
         })
+    })
+
+    describe('Execute-will functionality', () => {
+        beforeEach(async() =>{
+            DEATH_TIMEOUT = 120;
+            await will.createWill([user1.address], [ethers.utils.parseEther('20')])
+            await will.ping()
+        })
+
+        it('should revert if death timeout has not passed', async () => {
+            await expect(will.executeWill()).to.be
+                .revertedWith("Death timeout not reached")
+        })
+        it('should execute will and send ETH to beneficiaries after timeout', async () => {
+            await ethers.provider.send('evm_increaseTime', [DEATH_TIMEOUT + 1])
+            await ethers.provider.send('evm_mine');
+
+            const initAddr1Bal = await ethers.provider.getBalance(user1.address)
+
+            await will.executeWill()
+
+            const finalAddr1Bal = await ethers.provider.getBalance(user1.address)
+
+            expect(finalAddr1Bal.sub(initAddr1Bal)).to.equal(ethers.utils.parseEther('20'));
+
+            const willData = await will.will()
+            assert.equal(willData.executed, true)
+        })
+        it('should revert if will is already executed', async () => {
+            await ethers.provider.send('evm_increaseTime', [DEATH_TIMEOUT + 1])
+            await ethers.provider.send('evm_mine');
+
+            // const willData = await will.will()
+            await will.executeWill()
+            expect(will.executed).to.be.revertedWith("Will already executed")
+        })
+        it('should revert if will is cancelled', async () => {
+
+            await ethers.provider.send('evm_increaseTime', [DEATH_TIMEOUT + 1])
+            await ethers.provider.send('evm_mine');
+            await will.cancelWill();
+
+            const willData = await will.will()
+
+            expect(will.cancelled).to.be.revertedWith('Will already cancelled')
+        })
+        
+        
     })
 })
