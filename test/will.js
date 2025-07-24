@@ -126,7 +126,40 @@ describe('Digital Will Contract', () => {
 
             expect(will.cancelled).to.be.revertedWith('Will already cancelled')
         })
-        
-        
+    })
+
+    describe('Cancel Will', () => {
+        it('should revert if already executed', async () => {
+            await will.executeWill()
+
+            await expect(will.cancelWill()).to.be
+                .revertedWith("Will already executed")
+        })
+        it('should revert if already calcelled', async () => {
+            await will.cancelWill()
+
+            await expect(will.cancelWill()).to.be
+                .revertedWith("Will already cancelled")
+        })
+        it('should cancel the will and refund the owner', async () => {
+            const initBalance = await ethers.provider.getBalance(owner.address)
+
+            const tx = await will.cancelWill()
+            const receipt = await tx.wait()
+            const willData = await will.will()
+
+            const contractBalance = await ethers.provider.getBalance(will.address)
+            const finalBalance = await ethers.provider.getBalance(owner.address)
+
+            // check that the will was cancelled
+            assert.equal(willData.cancelled, true)
+
+            // check that the contract balance is 0
+            assert.equal(contractBalance, 0)
+
+            // check that the owner got refunded (considering gas cost)
+            // assert(finalBalance.gt(initBalance))
+            expect(finalBalance).to.be.above(initBalance.sub(receipt.gasUsed.mul(receipt.effectiveGasPrice)));
+        })
     })
 })
