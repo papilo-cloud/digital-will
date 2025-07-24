@@ -29,6 +29,8 @@ contract CreateWill {
     }
 
     event WillCreated(address[] _beneficiaries, uint256[] _amounts);
+    event WillExecuted();
+    event WillCancelled();
 
     function createWill(address[] memory _beneficiaries, uint256[] memory _amounts) external onlyOwner {
         require(_beneficiaries.length == _amounts.length, "Bebeficiaries and amount must be of the same length");
@@ -60,6 +62,8 @@ contract CreateWill {
         }
 
         will.executed = true;
+
+        emit WillExecuted();
     }
 
     function cancelWill() external {
@@ -73,6 +77,8 @@ contract CreateWill {
         }
 
         will.cancelled = true;
+
+        emit WillCancelled();
     }
 
     receive() external payable {}
