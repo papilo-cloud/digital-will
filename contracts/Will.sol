@@ -28,10 +28,12 @@ contract CreateWill {
         _;
     }
 
+    event WillCreated(address[] _beneficiaries, uint256[] _amounts);
+
     function createWill(address[] memory _beneficiaries, uint256[] memory _amounts) external onlyOwner {
         require(_beneficiaries.length == _amounts.length, "Bebeficiaries and amount must be of the same length");
         require(_beneficiaries.length > 0 && _amounts.length > 0, "At least one beneficiary and one amount is required");
-        require(_beneficiaries.length < 10 && _amounts.length < 10, "Maximum of 10 beneficiaries and amounts allowed");
+        require(_beneficiaries.length <= 10 && _amounts.length <= 10, "Maximum of 10 beneficiaries and amounts allowed");
 
         for (uint i = 0; i < _beneficiaries.length; i++) {
             require(_beneficiaries[i] != address(0), "Beneficiary address must be a valid address");
@@ -39,6 +41,8 @@ contract CreateWill {
             require(_amounts[i] < 100 ether, "Amount must be less than 100 ether");
         }
         will = Will(_beneficiaries, _amounts, false, block.timestamp, false);
+
+        emit WillCreated(_beneficiaries, _amounts);
     }
 
     function ping() external onlyOwner {
@@ -52,7 +56,7 @@ contract CreateWill {
 
         for (uint i = 0; i < will.beneficiaries.length ; i++) {
             (bool success, ) = payable(will.beneficiaries[i]).call{value: will.amounts[i]}("");
-            require(success);
+            require(success, "Transfer to beneficiary failed");
         }
 
         will.executed = true;
@@ -67,6 +71,8 @@ contract CreateWill {
             (bool success, ) = owner.call{value: balance}("");
             require(success);
         }
+
+        will.cancelled = true;
     }
 
     receive() external payable {}
