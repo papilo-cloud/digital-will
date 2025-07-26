@@ -4,7 +4,6 @@ pragma solidity ^0.8.20;
 contract CreateWill {
 
     address public owner;
-    uint DEATH_TIMEOUT = 2 minutes;
 
     struct Will {
         address[] beneficiaries;
@@ -12,47 +11,54 @@ contract CreateWill {
         bool executed;
         uint lastPing;
         bool cancelled;
+        uint256 balance;
+        uint256 deathTimeout;
     }
 
-    mapping(address => Will) private usersWill;
-    
-    Will public will;
+    mapping(address => Will) public usersWill;
 
-    constructor() payable {
-        require(msg.value >= 1 ether, "Minimum of 1 ether required to initialize the will");
+    event WillCreated(address indexed testator, address[] beneficiaries, uint256[] amounts, uint256 balance, uint256 deathTimeout);
+    event WillExecuted(address indexed testator);
+    event WillCancelled(address indexed testator);
+    event Ping(address indexed testator);
+
+    modifier onlyTestator() {
+        require(usersWill[msg.sender].beneficiaries.length > 0, "Will not found");
+        _;
+    }
+    
+    constructor() {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the owner");
-        _;
-    }
-
-    event WillCreated(address[] _beneficiaries, uint256[] _amounts);
-    event WillExecuted();
-    event WillCancelled();
-
-    function createWill(address[] memory _beneficiaries, uint256[] memory _amounts) external onlyOwner {
+    function createWill(address[] memory _beneficiaries, uint256[] memory _amounts, uint256 _deathTimeout) external payable {
+        require(usersWill[msg.sender].beneficiaries.length == 0, "Will already exists");
+        require(msg.value >= 1 ether, "Minimum of 1 ether required to create will");
         require(_beneficiaries.length == _amounts.length, "Bebeficiaries and amount must be of the same length");
-        require(_beneficiaries.length > 0 && _amounts.length > 0, "At least one beneficiary and one amount is required");
-        require(_beneficiaries.length <= 10 && _amounts.length <= 10, "Maximum of 10 beneficiaries and amounts allowed");
+        require(_beneficiaries.length > 0 && _amounts.length <= 10, "1 to 10 beneficiaries allowed");
 
+        uint256 total = 0;
         for (uint i = 0; i < _beneficiaries.length; i++) {
             require(_beneficiaries[i] != address(0), "Beneficiary address must be a valid address");
-            require(_amounts[i] > 0, "Amount must be greater than zero");
-            require(_amounts[i] < 100 ether, "Amount must be less than 100 ether");
+            require(_amounts[i] > 0 && _amounts[i] < 100 ether, "Invalid mount");
+
+            total += _amounts[i];
         }
-        will = Will(_beneficiaries, _amounts, false, block.timestamp, false);
 
-        emit WillCreated(_beneficiaries, _amounts);
+        require(total <= msg.value, "Insufficient ether sent");
+        usersWill[msg.sender] = Will(_beneficiaries, _amounts, false, block.timestamp, false, msg.value, _deathTimeout);
+
+        emit WillCreated(msg.sender, _beneficiaries, _amounts, msg.value, _deathTimeout);
     }
 
-    function ping() external onlyOwner {
-        will.lastPing = block.timestamp;
+    function ping() external onlyTestator {
+        usersWill[msg.sender].lastPing = block.timestamp;
+        emit Ping(msg.sender);
     }
 
-     function executeWill() external {
-        require((block.timestamp - will.lastPing) > DEATH_TIMEOUT, "Death timeout not reached");
+     function executeWill(address _testator) external {
+        Will storage will = usersWill[msg.sender];
+        require((block.timestamp - will.lastPing) > will.deathTimeout, "Testator still alive");
         require(!will.executed, "Will already executed");
         require(!will.cancelled, "Will already cancelled");
 
@@ -62,23 +68,30 @@ contract CreateWill {
         }
 
         will.executed = true;
+        will.balance = 0;
 
-        emit WillExecuted();
+        emit WillExecuted(_testator);
     }
 
-    function cancelWill() external {
+    function cancelWill() external onlyTestator {
+        Will storage will = usersWill[msg.sender];
         require(!will.executed, "Will already executed");
         require(!will.cancelled, "Will already cancelled");
 
-        uint balance = address(this).balance;
+        uint256 balance = will.balance;
+        will.cancelled = true;
+        will.balance = 0;
+
         if (balance > 0) {
-            (bool success, ) = owner.call{value: balance}("");
-            require(success);
+            (bool success, ) = payable(msg.sender).call{value: balance}("");
+            require(success, "REfund failed");
         }
 
-        will.cancelled = true;
+        emit WillCancelled(msg.sender);
+    }
 
-        emit WillCancelled();
+    function getWill(address _user) external view returns(Will memory) {
+        return usersWill[_user];
     }
 
     receive() external payable {}
