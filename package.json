@@ -15,8 +15,11 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "ethers": "^5.7.0",
     "hardhat": "^2.26.1"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-verify": "^2.1.0"
   }
 }
