@@ -57,7 +57,7 @@ contract CreateWill {
     }
 
      function executeWill(address _testator) external {
-        Will storage will = usersWill[msg.sender];
+        Will storage will = usersWill[_testator];
         require((block.timestamp - will.lastPing) > will.deathTimeout, "Testator still alive");
         require(!will.executed, "Will already executed");
         require(!will.cancelled, "Will already cancelled");
