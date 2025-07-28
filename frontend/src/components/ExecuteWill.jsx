@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState } from 'react'
 import { useContract } from '../context/ContractContext'
 import { ethers } from 'ethers'
@@ -43,6 +42,7 @@ const ExecuteWill = () => {
             <TextInput
                 type="text"
                 placeholder='Enter testator address'
+                className='w-full mb-4'
                 value={testatorAddress}
                 onChange={e => setTestatorAddress(e.target.value)}
             />
