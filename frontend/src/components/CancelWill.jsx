@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { useContract } from '../context/ContractContext'
 import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
+import Button from './Core/Buttons/Button'
+import ButtonText from './Core/Buttons/ButtonText'
 
 const CancelWill = () => {
     const [testatorAddress, setTestatorAddress] = useState('')
@@ -50,13 +52,13 @@ const CancelWill = () => {
   return (
     <div className='w-full mx-auto mt-10 bg-[#151515] p-6 rounded-xl shadow-md'>
         <h2 className='text-lg font-semibold mb-4 text-[#ccc]'>Cancel Will</h2>
-        <button
-          onClick={handleCancel}
-          disabled={loading}
-          className='bg-red-500 cursor-pointer text-[#ccc] px-4 py-2 rounded hover:bg-red-700 w-full'
+        <Button
+            disabled={loading}
+            onClick={handleCancel}
+            className='bg-red-600 hover:bg-red-700'
         >
-          {loading ? 'Cancelling...' : 'Cancel Will'}
-        </button>
+            <ButtonText>Cancel Will</ButtonText>
+        </Button>
     </div>
   )
 }
