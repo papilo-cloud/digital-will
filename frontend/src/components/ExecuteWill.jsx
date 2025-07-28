@@ -3,6 +3,10 @@ import { useState } from 'react'
 import { useContract } from '../context/ContractContext'
 import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
+import DashboardLayout from './DashboardLayout'
+import Button from './Core/Buttons/Button'
+import ButtonText from './Core/Buttons/ButtonText'
+import TextInput from './Core/Form/TextInput'
 
 const ExecuteWill = () => {
     const [testatorAddress, setTestatorAddress] = useState('')
@@ -24,32 +28,34 @@ const ExecuteWill = () => {
             const tx = await contract.executeWill(testatorAddress)
             await tx.wait();
             toast.success('Will executed successfully!')
-        } catch (err) {
-            console.error(err);
-            toast.error('Execution failed')
+        } catch (error) {
+            const message = error?.error?.message || error?.message || error;
+            console.error(message);
+            toast.error(message)
         } finally {
             setLoading(false)
         }
     }
   return (
-    <div className='max-w-md mx-auto mt-10 bg-white p-6 rounded-xl shadow-md'>
-        <h2 className='text-lg font-semibold mb-4'>Execute a Will</h2>
-        <input
-            type="text"
-            placeholder='Enter testator address'
-            className='w-full px-4 py-2 border rounded mb-4'
-            value={testatorAddress}
-            required
-            onChange={e => setTestatorAddress(e.target.value)}
-        />
-        <button
-            disabled={loading}
-            onClick={handleExecute}
-            className='bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full'
-        >
-            {loading ? 'Executing...': 'Execute Will'}
-        </button>
-    </div>
+    <DashboardLayout>
+        <div className='max-w-md mx-auto mt-10 bg-[#151515] p-6 rounded-xl shadow-md'>
+            <h2 className='text-lg font-semibold mb-4 text-[#ccc]'>Execute a Will</h2>
+            <TextInput
+                type="text"
+                placeholder='Enter testator address'
+                value={testatorAddress}
+                onChange={e => setTestatorAddress(e.target.value)}
+            />
+            <Button 
+                className='border-0 bg-[#1c7351] hover:bg-[#1c73]'
+                disabled={loading}
+                loading={loading}
+                onClick={handleExecute}
+            >
+                <ButtonText>Execute Will</ButtonText>
+            </Button>
+        </div>
+    </DashboardLayout>
   )
 }
 
