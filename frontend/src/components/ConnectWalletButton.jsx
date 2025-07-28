@@ -2,22 +2,24 @@ import React from 'react'
 import { useState } from 'react'
 import { useContract } from '../context/ContractContext'
 import truncate from '../utils/truncate'
+import Button from './Core/Buttons/Button'
+import ButtonText from './Core/Buttons/ButtonText'
 
 const ConnectWalletButton = () => {
 
     const { connectWallet, walletAddress, isConnected } = useContract()
 
   return (
-    <div>
+    <div className=' text-[#ccc] text-lg w-50 text-center'>
         {!isConnected ? (
-            <button
+            <Button
                 onClick={connectWallet}
-                className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer'
+                className='bg-[#1c7351] hover:bg-[#1c73] ring-[#1c73]'
             >
-                Connect Wallet
-            </button>
+                <ButtonText>Connect Wallet</ButtonText>
+            </Button>
         ): (
-            <p className='text-green-600 font-semibold'>Wallet: {truncate(walletAddress)}</p>
+            <p className='rounded-full py-2 items-center text-center justify-center w-full h-full bg-[#0a0a0a] m-auto'>{truncate(walletAddress)}</p>
         )}
     </div>
   )
