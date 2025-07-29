@@ -17,6 +17,8 @@ contract CreateWill {
 
     mapping(address => Will) public usersWill;
 
+    address[] public testators;
+
     event WillCreated(address indexed testator, address[] beneficiaries, uint256[] amounts, uint256 balance, uint256 deathTimeout);
     event WillExecuted(address indexed testator);
     event WillCancelled(address indexed testator);
@@ -47,6 +49,10 @@ contract CreateWill {
 
         require(total <= msg.value, "Insufficient ether sent");
         usersWill[msg.sender] = Will(_beneficiaries, _amounts, false, block.timestamp, false, msg.value, _deathTimeout);
+
+        if(usersWill[msg.sender].balance == 0) {
+            testators.push(msg.sender);
+        }
 
         emit WillCreated(msg.sender, _beneficiaries, _amounts, msg.value, _deathTimeout);
     }
@@ -98,6 +104,10 @@ contract CreateWill {
 
     function getWill(address _user) external view returns(Will memory) {
         return usersWill[_user];
+    }
+
+    function getAllTestators() external view returns(address[] memory) {
+        return testators;
     }
 
     receive() external payable {}
