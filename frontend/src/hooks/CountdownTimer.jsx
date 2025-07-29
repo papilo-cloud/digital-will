@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers"
 import { useEffect, useState } from "react"
-import formatTime from "./formatTime"
+import formatTime from "../utils/formatTime"
 
 const CountdownTimer = ({lastPing, deathTimeout}) => {
     const [timeleft, setTimeLeft] = useState(0)
