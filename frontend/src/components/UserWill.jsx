@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import truncate from '../utils/truncate'
-import CountdownTimer from '../utils/CountdownTimer'
+import CountdownTimer from '../hooks/CountdownTimer'
 import formatTime from '../utils/formatTime'
 
 
