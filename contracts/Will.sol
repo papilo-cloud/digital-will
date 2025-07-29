@@ -68,6 +68,7 @@ contract CreateWill {
         require((block.timestamp - will.lastPing) > will.deathTimeout, "Testator still alive");
         require(!will.executed, "Will already executed");
         require(!will.cancelled, "Will already cancelled");
+        require(will.balance != 0, "Will don't exist");
 
         for (uint i = 0; i < will.beneficiaries.length ; i++) {
             (bool success, ) = payable(will.beneficiaries[i]).call{value: will.amounts[i]}("");
