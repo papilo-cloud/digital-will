@@ -1,5 +1,5 @@
 import React from 'react'
-import ConnectWalletButton from './ConnectWalletButton'
+import ConnectWalletButton from '../components/Core/Buttons/ConnectWalletButton'
 
 const Header = () => {
   return (
