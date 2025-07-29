@@ -32,7 +32,7 @@ contract CreateWill {
     }
 
     function createWill(address[] memory _beneficiaries, uint256[] memory _amounts, uint256 _deathTimeout) external payable {
-        require(usersWill[msg.sender].beneficiaries.length == 0, "Will already exists");
+        require(usersWill[msg.sender].beneficiaries.length == 0 || usersWill[msg.sender].cancelled || usersWill[msg.sender].executed, "Will already exists");
         require(msg.value >= 1 ether, "Minimum of 1 ether required to create will");
         require(_beneficiaries.length == _amounts.length, "Bebeficiaries and amount must be of the same length");
         require(_beneficiaries.length > 0 && _amounts.length <= 10, "1 to 10 beneficiaries allowed");
@@ -52,6 +52,7 @@ contract CreateWill {
     }
 
     function ping() external onlyTestator {
+        require(!usersWill[msg.sender].cancelled || !usersWill[msg.sender].executed, "Will don't exist");
         usersWill[msg.sender].lastPing = block.timestamp;
         emit Ping(msg.sender);
     }
@@ -69,6 +70,8 @@ contract CreateWill {
 
         will.executed = true;
         will.balance = 0;
+        delete will.beneficiaries;
+        delete will.amounts;
 
         emit WillExecuted(_testator);
     }
@@ -80,6 +83,9 @@ contract CreateWill {
 
         uint256 balance = will.balance;
         will.cancelled = true;
+        delete will.beneficiaries;
+        delete will.amounts;
+
         will.balance = 0;
 
         if (balance > 0) {
