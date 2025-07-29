@@ -1,51 +1,33 @@
-import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { useContract } from '../context/ContractContext'
-import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
 import Button from './Core/Buttons/Button'
 import ButtonText from './Core/Buttons/ButtonText'
 
-const CancelWill = () => {
-    const [testatorAddress, setTestatorAddress] = useState('')
+const CancelWill = ({onCancelComplete}) => {
     const [loading, setLoading] = useState(false)
-    const [isTestator, setIsTestator] = useState(false)
 
-    const {contract, walletAddress} = useContract()
-
-    useEffect(() => {
-      const checkIfTestator = async () => {
-        if(!contract || !walletAddress) return;
-        try {
-          const will = await contract.usersWill(walletAddress)
-          setIsTestator(will?.beneficiaries?.length > 0);
-        } catch (err) {
-          console.error(err);
-          setIsTestator(false)
-        }
-      }
-      checkIfTestator()
-    }, [contract, walletAddress])
+    const {contract} = useContract()
 
     const handleCancel = async () => {
         if (!contract) {
             toast.warn('Contract not connected.')
             return;
         }
-        if (!isTestator) {
-            toast.warn('You are not the owner of any will')
-            return;
-        }
+        
+        setLoading(true)
         try {
-          setLoading(true)
             const tx = await contract.cancelWill()
             await tx.wait()
             toast.success("Will cancelled and funds refunded!")
-        } catch (err) {
-          console.error(err);
-          toast.error('Failed to cancel Will.')
+
+            if(onCancelComplete) onCancelComplete();
+        } catch (error) {
+            const message = error?.error?.message || error?.message || error;
+            console.error(message);
+            toast.error(message)
         } finally {
-          setLoading(false)
+            setLoading(false)
         }
     }
     
@@ -54,6 +36,7 @@ const CancelWill = () => {
         <h2 className='text-lg font-semibold mb-4 text-[#ccc]'>Cancel Will</h2>
         <Button
             disabled={loading}
+            loading={loading}
             onClick={handleCancel}
             className='bg-red-600 hover:bg-red-700'
         >
