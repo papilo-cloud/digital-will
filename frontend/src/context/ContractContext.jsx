@@ -1,12 +1,12 @@
 import { Contract, ethers } from 'ethers'
 import contractAbi from '../abi/CreateWill.json'
 import { createContext, useContext, useEffect, useState } from 'react';
+import { contractAddress } from '../utils/contractAddress';
 
 
 const ContractContext = createContext();
 
 const ABI = contractAbi.abi;
-const contractAddrs = '0x4537421997284D7C3f5926776fcE759eE1c071cc';
 
 export const ContractProvider = ({children}) => {
   const [contract, setContract] = useState(null);
@@ -20,18 +20,15 @@ export const ContractProvider = ({children}) => {
 
     try {
       const ethProvider = new ethers.providers.Web3Provider(window.ethereum);
-      // const accounts = await ethProvider.send('eth_requestAccounts', [])
       await ethProvider.send('eth_requestAccounts', []);
       const signer = ethProvider.getSigner()
       const address = await signer.getAddress();
-      const instance = new Contract(contractAddrs, ABI, signer)
+      const instance = new Contract(contractAddress, ABI, signer)
 
       setWalletAddress(address)
       setProvider(ethProvider)
       setContract(instance)
       setSigner(signer)
-
-      console.log(address)
 
     } catch (err) {
       console.error('Connection Failed:', err);
