@@ -3,6 +3,8 @@ import { useContract } from '../context/ContractContext'
 import { toast } from 'react-toastify'
 import Button from './Core/Buttons/Button'
 import ButtonText from './Core/Buttons/ButtonText'
+import CardHeader from './Card/CardHeader'
+import Card from './Card/Card'
 
 const CancelWill = ({onCancelComplete}) => {
     const [loading, setLoading] = useState(false)
@@ -32,8 +34,8 @@ const CancelWill = ({onCancelComplete}) => {
     }
     
   return (
-    <div className='w-full mx-auto mt-10 bg-[#151515] p-6 rounded-xl shadow-md'>
-        <h2 className='text-lg font-semibold mb-4 text-[#ccc]'>Cancel Will</h2>
+    <Card className='w-full'>
+        <CardHeader>Cancel Will</CardHeader>
         <Button
             disabled={loading}
             loading={loading}
@@ -42,7 +44,7 @@ const CancelWill = ({onCancelComplete}) => {
         >
             <ButtonText>Cancel Will</ButtonText>
         </Button>
-    </div>
+    </Card>
   )
 }
 

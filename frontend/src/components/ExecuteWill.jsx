@@ -6,6 +6,8 @@ import DashboardLayout from './DashboardLayout'
 import Button from './Core/Buttons/Button'
 import ButtonText from './Core/Buttons/ButtonText'
 import TextInput from './Core/Form/TextInput'
+import Card from './Card/Card'
+import CardHeader from './Card/CardHeader'
 
 const ExecuteWill = () => {
     const [testatorAddress, setTestatorAddress] = useState('')
@@ -37,8 +39,8 @@ const ExecuteWill = () => {
     }
   return (
     <DashboardLayout>
-        <div className='max-w-md mx-auto mt-10 bg-[#151515] p-6 rounded-xl shadow-md'>
-            <h2 className='text-lg font-semibold mb-4 text-[#ccc]'>Execute a Will</h2>
+        <Card className='mt-10'>
+            <CardHeader>Execute a Wil</CardHeader>
             <TextInput
                 type="text"
                 placeholder='Enter testator address'
@@ -47,14 +49,14 @@ const ExecuteWill = () => {
                 onChange={e => setTestatorAddress(e.target.value)}
             />
             <Button 
-                className='border-0 bg-[#1c7351] hover:bg-[#1c73]'
+                className='bg-[#1c7351] hover:bg-[#1c73] ring-bg-[#1c73]'
                 disabled={loading}
                 loading={loading}
                 onClick={handleExecute}
             >
                 <ButtonText>Execute Will</ButtonText>
             </Button>
-        </div>
+        </Card>
     </DashboardLayout>
   )
 }

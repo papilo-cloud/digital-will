@@ -3,6 +3,8 @@ import { useContract } from '../context/ContractContext'
 import { toast } from 'react-toastify'
 import Button from './Core/Buttons/Button'
 import ButtonText from './Core/Buttons/ButtonText'
+import Card from './Card/Card'
+import CardHeader from './Card/CardHeader'
 
 const PingWill = ({onPingComplete}) => {
     const [loading, setLoading] = useState(false)
@@ -31,8 +33,8 @@ const PingWill = ({onPingComplete}) => {
     }
 
   return (
-    <div className='w-full bg-[#151515] p-6 rounded-xl shadow-md'>
-        <h2 className='text-lg font-semibold mb-4 text-[#ccc]'>Ping Will</h2>
+    <Card className='w-full'>
+        <CardHeader>Ping Will</CardHeader>
         <Button
             className='bg-[#34516e] hover:bg-[#2e4052] ring-[#2e4052]'
             onClick={handlePing}
@@ -41,7 +43,7 @@ const PingWill = ({onPingComplete}) => {
         >
             <ButtonText>Ping Now</ButtonText>
         </Button>
-    </div>
+    </Card>
   )
 }
 
