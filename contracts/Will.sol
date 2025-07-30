@@ -48,11 +48,12 @@ contract CreateWill {
         }
 
         require(total <= msg.value, "Insufficient ether sent");
-        usersWill[msg.sender] = Will(_beneficiaries, _amounts, false, block.timestamp, false, msg.value, _deathTimeout);
-
+        
         if(usersWill[msg.sender].balance == 0) {
             testators.push(msg.sender);
         }
+
+        usersWill[msg.sender] = Will(_beneficiaries, _amounts, false, block.timestamp, false, msg.value, _deathTimeout);
 
         emit WillCreated(msg.sender, _beneficiaries, _amounts, msg.value, _deathTimeout);
     }
