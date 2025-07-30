@@ -1,14 +1,20 @@
+import { useEffect } from 'react'
 import { useContract } from '../../../context/ContractContext'
 import truncate from '../../../utils/truncate'
 import Button from './Button'
 import ButtonText from './ButtonText'
+import { toast } from 'react-toastify'
 
 const ConnectWalletButton = () => {
 
-    const { connectWallet, walletAddress, isConnected } = useContract()
+    const { connectWallet, walletAddress, isConnected, networkError } = useContract()
+
+    useEffect(() => {
+        toast.error(networkError)
+    }, [networkError])
 
   return (
-    <div className=' text-[#ccc] text-lg w-50 text-center'>
+    <>
         {!isConnected ? (
             <Button
                 onClick={connectWallet}
@@ -17,9 +23,9 @@ const ConnectWalletButton = () => {
                 <ButtonText>Connect Wallet</ButtonText>
             </Button>
         ): (
-            <p className='rounded-full py-2 items-center text-center justify-center w-full h-full bg-[#0a0a0a] m-auto'>{truncate(walletAddress)}</p>
+            <p className='text-[#ccc] text-lg rounded-full items-center text-center justify-center w-full h-full bg-[#0a0a0a] m-auto py-[0.625em] px-[1.625em]'>{truncate(walletAddress)}</p>
         )}
-    </div>
+    </>
   )
 }
 
