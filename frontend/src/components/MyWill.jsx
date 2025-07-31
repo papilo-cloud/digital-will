@@ -6,15 +6,15 @@ import CancelWill from './CancelWill'
 import CreateWillForm from './WillForm'
 import { useContract } from '../context/ContractContext'
 import DashboardLayout from './DashboardLayout'
+import useGetWills from '../hooks/useGetWills'
 
 const MyWill = () => {
-    const [hasWill, setHasWill] = useState(false)
-    const [willInfo, setWillInfo] = useState(null)
     const [loading, setLoading] = useState(true)
     const [beneficiaries, setBeneficiaries] = useState(null)
     const [amounts, setAmounts] = useState(null)
 
     const { walletAddress, contract} = useContract()
+    const {willInfo, hasWill, fetchAllWills} = useGetWills()
 
     const fetchWillInfo = async () => {
         if (!contract || !walletAddress) return
@@ -30,12 +30,10 @@ const MyWill = () => {
             setBeneficiaries(beneficiaries)
             setAmounts(amounts)
 
+            if(fetchAllWills) fetchAllWills();
+
             }
 
-            const will = await contract.usersWill(walletAddress);
-            const isCreated =  will?.balance.gt(0);
-            setHasWill(isCreated)
-            setWillInfo(will);
         } catch (error) {
             const message = error?.error?.message || error?.message || error;
             console.error(message);
@@ -55,7 +53,7 @@ const MyWill = () => {
             {hasWill ? (
                 <DashboardLayout>
                     {loading ? (
-                        <div className='text-center text-2xl text-white'> Loading Will data...</div>
+                        <div className='text-center text-2xl text-white mt-20'> Loading Will data...</div>
                     ):(
                         <div className=' max-w-3xl flex gap-4 items-center mx-auto'>
                             <UserWill willInfo={willInfo} beneficiaries={beneficiaries} amounts={amounts} />
