@@ -1,8 +1,9 @@
 import { BigNumber } from "ethers"
 import { useEffect, useState } from "react"
 import formatTime from "../utils/formatTime"
+import clsx from "clsx"
 
-const CountdownTimer = ({lastPing, deathTimeout}) => {
+const CountdownTimer = ({lastPing, deathTimeout, className, children}) => {
     const [timeleft, setTimeLeft] = useState(0)
 
     useEffect(() => {
@@ -23,8 +24,8 @@ const CountdownTimer = ({lastPing, deathTimeout}) => {
     }, [lastPing, deathTimeout])
 
     return (
-        <div className="text-lg font-semibold text-[#fff] text-center mt-2">
-            Will executable in: {formatTime(timeleft)}
+        <div className={clsx("font-normal", className)}>
+            {children} {formatTime(timeleft)}
         </div>
     )
 }
