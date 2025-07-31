@@ -33,7 +33,13 @@ const UserWill = ({beneficiaries, amounts, willInfo}) => {
         <p className='border-b-1 p-3 flex justify-between items-center'>
           <strong className='text-[#bbb]'>Cancelled:</strong> <span>{willInfo?.cancelled ? 'Yes' : 'No'}</span>
         </p>
-        <CountdownTimer lastPing={willInfo.lastPing} deathTimeout={willInfo.deathTimeout} />
+        <CountdownTimer 
+          lastPing={willInfo.lastPing} 
+          deathTimeout={willInfo.deathTimeout}
+          className='text-white text-xl mt-2 text-center font-semibold'
+        >
+          Will executable in:
+        </CountdownTimer>
     </div>
   )
 }
