@@ -45,9 +45,10 @@ const useGetWills = () => {
             const now = Math.floor(Date.now() / 1000)
             const willList = []
 
-            // console.log('Testators:',testators)
+            const uniqueTestators = [...new Set(testators)]
 
-            for (const addr of testators) {
+
+            for (const addr of uniqueTestators) {
                 const wills = await contract.usersWill(addr)
                 const timeLeft = parseInt(wills.lastPing) + parseInt(wills.deathTimeout) - now;
 
@@ -58,6 +59,9 @@ const useGetWills = () => {
                     isDead: timeLeft <= 0 && !wills.executed && !wills.cancelled
                 })
             }
+
+            // console.log(willList)
+            // console.log(will[0].lastPing)
 
             setWills(willList)
             setHasWill(isCreated)
@@ -74,7 +78,7 @@ const useGetWills = () => {
 
     useEffect(() => {
         fetchAllWills()
-    }, [contract, isConnected])
+    }, [contract, isConnected, walletAddress])
 
   return {fetchAllWills, wills, willsCreated, totalBalance, hasWill, willInfo}
 }
